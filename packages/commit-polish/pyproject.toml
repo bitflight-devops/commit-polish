@@ -32,6 +32,10 @@ target-version = "py311"
 python_version = "3.11"
 strict = true
 
+[[tool.mypy.overrides]]
+module = ["litellm", "litellm.*", "tomlkit", "tomlkit.*", "typer", "typer.*", "rich", "rich.*"]
+ignore_missing_imports = true
+
 [dependency-groups]
 dev = [
     "pytest>=9.0.2",

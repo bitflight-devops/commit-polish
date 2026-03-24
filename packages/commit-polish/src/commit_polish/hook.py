@@ -46,7 +46,7 @@ def run_hook(commit_msg_file: str) -> int:
         return 0
 
     # Skip if the message is already detailed (user wrote it intentionally)
-    lines = [l for l in original_message.splitlines() if not l.startswith("#")]
+    lines = [line for line in original_message.splitlines() if not line.startswith("#")]
     meaningful = "\n".join(lines).strip()
     if len(meaningful) > 72 and "\n" in meaningful:
         return 0  # Looks intentional — don't overwrite

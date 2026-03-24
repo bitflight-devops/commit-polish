@@ -84,4 +84,4 @@ async def generate_commit_message(
     if not content:
         raise AIServiceError("LLM returned an empty response.")
 
-    return content.strip()
+    return str(content).strip()
