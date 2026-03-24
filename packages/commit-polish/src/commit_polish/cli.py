@@ -123,6 +123,12 @@ def _show_result(result: RewriteResult) -> None:
 @app.command("hook")  # type: ignore[untyped-decorator]
 def hook_command(
     commit_msg_file: str = typer.Argument(..., help="Path to the commit message file"),
+    commit_source: str | None = typer.Argument(
+        None, help="Commit source (message/template/merge/squash/commit)"
+    ),
+    commit_sha: str | None = typer.Argument(
+        None, help="SHA of the commit being amended (only with 'commit' source)"
+    ),
 ) -> None:
     """Run as a prepare-commit-msg hook. Called automatically by pre-commit."""
     sys.exit(run_hook(commit_msg_file))

@@ -133,6 +133,8 @@ async def generate_commit_message(
     except Exception as e:
         raise AIServiceError(f"LLM call failed: {e}") from e
 
+    if not response.choices:
+        raise AIServiceError("LLM returned no choices in response.")
     content = response.choices[0].message.content
     if not content:
         raise AIServiceError("LLM returned an empty response.")

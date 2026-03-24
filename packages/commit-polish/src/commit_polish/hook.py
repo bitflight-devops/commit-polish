@@ -10,6 +10,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from commit_polish.ai_service import AIServiceError
 from commit_polish.config import load_config
 from commit_polish.message_rewriter import rewrite_message_sync
 from commit_polish.validators.detector import detect_validators
@@ -51,27 +52,41 @@ def run_hook(commit_msg_file: str) -> int:
     if len(meaningful) > 72 and "\n" in meaningful:
         return 0  # Looks intentional — don't overwrite
 
-    config = load_config()
     diff = get_staged_diff()
 
-    validators = detect_validators(
-        validator_command=config.validation.validator_command,
-        auto_detect=config.validation.auto_detect,
-    )
-
     try:
+        config = load_config()
+        validators = detect_validators(
+            validator_command=config.validation.validator_command,
+            auto_detect=config.validation.auto_detect,
+        )
         result = rewrite_message_sync(
             diff=diff,
             original_message=meaningful,
             config=config,
             validators=validators,
         )
-    except Exception as e:
+    except AIServiceError as e:
         print(
             f"commit-polish: LLM unavailable, keeping original message. ({e})",
             file=sys.stderr,
         )
         return 0  # Don't block the commit
+    except Exception as e:
+        print(
+            f"commit-polish: unexpected error, keeping original message. ({e})",
+            file=sys.stderr,
+        )
+        return 0  # Don't block the commit
+
+    # Don't overwrite a user's draft with a message that already failed validation
+    if result.validation_errors:
+        print(
+            "commit-polish: rewritten message failed validation after max retries, "
+            "keeping original message.",
+            file=sys.stderr,
+        )
+        return 0
 
     # Write the polished message back
     msg_path.write_text(result.message + "\n")

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable
 from dataclasses import dataclass
 
 from commit_polish.ai_service import generate_commit_message, AIServiceError
@@ -23,7 +24,7 @@ async def rewrite_message(
     original_message: str,
     config: Config,
     validators: list[ValidatorBase],
-    on_attempt: object = None,  # Optional callback(attempt_num, message) for progress
+    on_attempt: Callable[[int, str], None] | None = None,  # Optional callback(attempt_num, message) for progress
 ) -> RewriteResult:
     """Rewrite a commit message using the LLM, with validation retry loop.
 
@@ -99,7 +100,7 @@ def rewrite_message_sync(
     original_message: str,
     config: Config,
     validators: list[ValidatorBase],
-    on_attempt: object = None,
+    on_attempt: Callable[[int, str], None] | None = None,
 ) -> RewriteResult:
     """Synchronous wrapper around rewrite_message."""
     return asyncio.run(

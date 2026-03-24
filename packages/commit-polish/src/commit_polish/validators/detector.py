@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import shlex
 import subprocess
 from pathlib import Path
 
@@ -17,23 +18,6 @@ COMMITLINT_CONFIG_FILES = [
     ".commitlintrc.yaml",
     ".commitlintrc.yml",
     ".commitlintrc.js",
-]
-
-SEMANTIC_RELEASE_FILES = [
-    "release.config.js",
-    "release.config.cjs",
-    ".releaserc",
-    ".releaserc.json",
-    ".releaserc.yaml",
-    ".releaserc.yml",
-]
-
-COMMITIZEN_FILES = [
-    ".cz.json",
-    ".cz.toml",
-    ".cz.yaml",
-    ".cz.yml",
-    "cz.json",
 ]
 
 
@@ -81,8 +65,8 @@ class CommandValidator(ValidatorBase):
     def validate(self, message: str) -> ValidationResult:
         try:
             result = subprocess.run(
-                self.command,
-                shell=True,
+                shlex.split(self.command),
+                shell=False,
                 input=message,
                 capture_output=True,
                 text=True,
@@ -96,7 +80,7 @@ class CommandValidator(ValidatorBase):
                 if line.strip()
             ]
             return ValidationResult.fail(errors or ["Validation command failed"])
-        except subprocess.TimeoutExpired:
+        except (subprocess.TimeoutExpired, FileNotFoundError):
             return ValidationResult.ok()
 
     def get_rules_prompt(self) -> str:
