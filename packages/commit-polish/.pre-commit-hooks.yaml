@@ -1,0 +1,8 @@
+- id: commit-polish
+  name: Commit Polish
+  description: Rewrites git commit messages using a local LLM to match your project's conventions
+  language: python
+  entry: commit-polish hook
+  stages: [prepare-commit-msg]
+  pass_filenames: false
+  always_run: true
