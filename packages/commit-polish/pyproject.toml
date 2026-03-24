@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "commit-polish"
 version = "0.1.0"
 description = "AI-powered git commit message rewriter using local LLMs via LiteLLM"
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 dependencies = [
     "litellm>=1.0.0",
     "tomlkit>=0.12.0",
@@ -26,10 +26,10 @@ asyncio_mode = "auto"
 
 [tool.ruff]
 src = ["src"]
-target-version = "py311"
+target-version = "py313"
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.13"
 strict = true
 
 [[tool.mypy.overrides]]
