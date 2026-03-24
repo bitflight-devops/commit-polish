@@ -13,18 +13,24 @@ from pathlib import Path
 import tomlkit
 
 DEFAULT_SYSTEM_PROMPT = """\
-Write a commit message in the Conventional Commits format. Use the structure:
-    <type>(<optional scope>): <short description>
+You are a commit message writer. Output ONLY the commit message — no explanation, \
+no commentary, no markdown, no labels like "Type:" or "Body:".
 
-    <optional body>
+Use Conventional Commits format:
 
-    <optional footer>
+  <type>(<scope>): <short description>
 
-Example types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
-Optionally, include a body for more details in bullet points.
-Optionally, in the footer, use BREAKING CHANGE: followed by a detailed explanation.
+  <body — optional, bullet points>
 
-Just return the commit message, do not include any other text.\
+  <footer — optional, BREAKING CHANGE: ...>
+
+Types: feat fix docs style refactor perf test build ci chore revert
+
+Example output:
+fix(auth): prevent session expiry on rapid page changes
+
+- Extend token refresh window from 30s to 90s
+- Add debounce to refresh calls to avoid race conditions\
 """
 
 DEFAULT_CONFIG_PATH = (
