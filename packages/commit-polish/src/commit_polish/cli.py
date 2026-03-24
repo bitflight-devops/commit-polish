@@ -10,7 +10,6 @@ Commands:
 
 from __future__ import annotations
 
-import subprocess
 import sys
 from pathlib import Path
 from typing import Optional
@@ -43,6 +42,7 @@ err_console = Console(stderr=True)
 
 # ── hook command ─────────────────────────────────────────────────────────────
 
+
 @app.command("hook")
 def hook_command(
     commit_msg_file: str = typer.Argument(..., help="Path to the commit message file"),
@@ -52,6 +52,7 @@ def hook_command(
 
 
 # ── preview command ──────────────────────────────────────────────────────────
+
 
 @app.command("preview")
 def preview_command(
@@ -107,7 +108,11 @@ def preview_command(
     if show_diff and diff:
         console.print(
             Panel(
-                Syntax(diff[:3000] + ("..." if len(diff) > 3000 else ""), "diff", line_numbers=False),
+                Syntax(
+                    diff[:3000] + ("..." if len(diff) > 3000 else ""),
+                    "diff",
+                    line_numbers=False,
+                ),
                 title="[dim]Staged diff[/dim]",
                 border_style="dim",
             )
@@ -197,6 +202,7 @@ def preview_command(
 
 # ── test command ─────────────────────────────────────────────────────────────
 
+
 @app.command("test")
 def test_command(
     message: str = typer.Option("", "--message", "-m", help="Draft commit message"),
@@ -227,12 +233,15 @@ def test_command(
 
 # ── config subcommands ────────────────────────────────────────────────────────
 
+
 @config_app.command("init")
 def config_init(
     path: Optional[Path] = typer.Option(
         None, "--path", help="Write config to this path instead of default"
     ),
-    force: bool = typer.Option(False, "--force", "-f", help="Overwrite existing config"),
+    force: bool = typer.Option(
+        False, "--force", "-f", help="Overwrite existing config"
+    ),
 ) -> None:
     """Write a default config file to ~/.config/commit-polish/config.toml."""
     target = path or DEFAULT_CONFIG_PATH
@@ -244,7 +253,7 @@ def config_init(
 
     written = write_default_config(target)
     console.print(f"[green]✓ Config written to {written}[/green]")
-    console.print(f"\nEdit it to set your llamafile path and model.")
+    console.print("\nEdit it to set your llamafile path and model.")
 
 
 @config_app.command("show")
@@ -271,7 +280,9 @@ def config_show(
     table.add_row("ai", "max_tokens", str(config.ai.max_tokens))
     table.add_row("ai", "api_base", config.ai.api_base)
     table.add_row("llamafile", "path", config.llamafile.path or "[dim]not set[/dim]")
-    table.add_row("llamafile", "model_path", config.llamafile.model_path or "[dim]not set[/dim]")
+    table.add_row(
+        "llamafile", "model_path", config.llamafile.model_path or "[dim]not set[/dim]"
+    )
     table.add_row("validation", "auto_detect", str(config.validation.auto_detect))
     table.add_row("validation", "max_retries", str(config.validation.max_retries))
 

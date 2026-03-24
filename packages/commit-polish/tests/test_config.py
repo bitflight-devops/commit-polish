@@ -1,13 +1,11 @@
 """Tests for the config module."""
 
-import pytest
 from pathlib import Path
 import tomlkit
 
 from commit_polish.config import (
     load_config,
     write_default_config,
-    Config,
     DEFAULT_SYSTEM_PROMPT,
 )
 

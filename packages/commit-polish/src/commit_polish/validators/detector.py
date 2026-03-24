@@ -60,9 +60,7 @@ class CommitlintValidator(ValidatorBase):
             )
             if result.returncode == 0:
                 return ValidationResult.ok()
-            errors = [
-                line for line in result.stdout.splitlines() if line.strip()
-            ]
+            errors = [line for line in result.stdout.splitlines() if line.strip()]
             return ValidationResult.fail(errors or ["commitlint validation failed"])
         except (subprocess.TimeoutExpired, FileNotFoundError):
             return ValidationResult.ok()  # Validator unavailable — skip
@@ -93,7 +91,8 @@ class CommandValidator(ValidatorBase):
             if result.returncode == 0:
                 return ValidationResult.ok()
             errors = [
-                line for line in (result.stdout + result.stderr).splitlines()
+                line
+                for line in (result.stdout + result.stderr).splitlines()
                 if line.strip()
             ]
             return ValidationResult.fail(errors or ["Validation command failed"])

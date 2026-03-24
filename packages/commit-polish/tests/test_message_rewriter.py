@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import AsyncMock, patch
 
 from commit_polish.config import Config
-from commit_polish.message_rewriter import rewrite_message, RewriteResult
+from commit_polish.message_rewriter import rewrite_message
 from commit_polish.validators.base import ValidatorBase, ValidationResult
 
 

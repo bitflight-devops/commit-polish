@@ -1,6 +1,5 @@
 """Tests for the preview CLI command."""
 
-import pytest
 from pathlib import Path
 from typer.testing import CliRunner
 from unittest.mock import patch, MagicMock
@@ -74,14 +73,18 @@ def test_preview_shows_validation_warnings() -> None:
     )
     with (
         patch("commit_polish.cli.get_staged_diff", return_value="+ code"),
-        patch("commit_polish.cli.rewrite_message_sync", return_value=result_with_warnings),
+        patch(
+            "commit_polish.cli.rewrite_message_sync", return_value=result_with_warnings
+        ),
     ):
         result = runner.invoke(app, ["preview"])
     assert "subject-case" in result.output
 
 
 def test_preview_shows_attempt_count_when_retried() -> None:
-    multi_attempt = RewriteResult(message="fix: corrected", attempts=3, validation_errors=[])
+    multi_attempt = RewriteResult(
+        message="fix: corrected", attempts=3, validation_errors=[]
+    )
     with (
         patch("commit_polish.cli.get_staged_diff", return_value="+ fix"),
         patch("commit_polish.cli.rewrite_message_sync", return_value=multi_attempt),
@@ -113,6 +116,8 @@ def test_config_show_missing(tmp_path: Path) -> None:
 
 def test_config_show_existing(tmp_path: Path) -> None:
     target = tmp_path / "config.toml"
-    target.write_text("[ai]\nmodel = 'llamafile/test'\ntemperature = 0.5\nmax_tokens = 100\n")
+    target.write_text(
+        "[ai]\nmodel = 'llamafile/test'\ntemperature = 0.5\nmax_tokens = 100\n"
+    )
     result = runner.invoke(app, ["config", "show", "--path", str(target)])
     assert "llamafile/test" in result.output

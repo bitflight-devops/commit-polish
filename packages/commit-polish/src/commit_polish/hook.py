@@ -34,7 +34,9 @@ def run_hook(commit_msg_file: str) -> int:
     msg_path = Path(commit_msg_file)
 
     if not msg_path.exists():
-        print(f"commit-polish: message file not found: {commit_msg_file}", file=sys.stderr)
+        print(
+            f"commit-polish: message file not found: {commit_msg_file}", file=sys.stderr
+        )
         return 1
 
     original_message = msg_path.read_text().strip()
@@ -65,7 +67,10 @@ def run_hook(commit_msg_file: str) -> int:
             validators=validators,
         )
     except Exception as e:
-        print(f"commit-polish: LLM unavailable, keeping original message. ({e})", file=sys.stderr)
+        print(
+            f"commit-polish: LLM unavailable, keeping original message. ({e})",
+            file=sys.stderr,
+        )
         return 0  # Don't block the commit
 
     # Write the polished message back

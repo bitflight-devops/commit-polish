@@ -27,9 +27,11 @@ Optionally, in the footer, use BREAKING CHANGE: followed by a detailed explanati
 Just return the commit message, do not include any other text.\
 """
 
-DEFAULT_CONFIG_PATH = Path(
-    os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")
-) / "commit-polish" / "config.toml"
+DEFAULT_CONFIG_PATH = (
+    Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+    / "commit-polish"
+    / "config.toml"
+)
 
 
 @dataclass
