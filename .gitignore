@@ -191,6 +191,9 @@ cython_debug/
 # Ruff stuff:
 .ruff_cache/
 
+# CocoIndex code search index
+.cocoindex_code/
+
 # PyPI configuration file
 .pypirc
 
