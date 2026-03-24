@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
@@ -23,7 +22,7 @@ from rich.table import Table
 from rich import box
 
 from commit_polish.config import load_config, write_default_config, DEFAULT_CONFIG_PATH
-from commit_polish.message_rewriter import rewrite_message_sync
+from commit_polish.message_rewriter import rewrite_message_sync, RewriteResult
 from commit_polish.validators.detector import detect_validators
 from commit_polish.hook import get_staged_diff, run_hook
 from commit_polish.ai_service import AIServiceError
@@ -43,7 +42,7 @@ err_console = Console(stderr=True)
 # ── hook command ─────────────────────────────────────────────────────────────
 
 
-@app.command("hook")
+@app.command("hook")  # type: ignore[untyped-decorator]
 def hook_command(
     commit_msg_file: str = typer.Argument(..., help="Path to the commit message file"),
 ) -> None:
@@ -54,18 +53,18 @@ def hook_command(
 # ── preview command ──────────────────────────────────────────────────────────
 
 
-@app.command("preview")
+@app.command("preview")  # type: ignore[untyped-decorator]
 def preview_command(
-    message: Optional[str] = typer.Option(
+    message: str | None = typer.Option(
         None, "--message", "-m", help="Draft commit message (defaults to empty)"
     ),
-    diff_file: Optional[Path] = typer.Option(
+    diff_file: Path | None = typer.Option(
         None, "--diff", "-d", help="Read diff from file instead of git staged changes"
     ),
     show_diff: bool = typer.Option(
         False, "--show-diff", help="Print the diff alongside the result"
     ),
-    config_path: Optional[Path] = typer.Option(
+    config_path: Path | None = typer.Option(
         None, "--config", "-c", help="Path to config file"
     ),
 ) -> None:
@@ -131,7 +130,7 @@ def preview_command(
     def on_attempt(attempt: int, msg: str) -> None:
         attempts_log.append((attempt, msg))
 
-    result_holder: list[object] = []
+    result: RewriteResult | None = None
     error_holder: list[Exception] = []
 
     with Progress(
@@ -150,7 +149,6 @@ def preview_command(
                 validators=validators,
                 on_attempt=on_attempt,
             )
-            result_holder.append(result)
         except AIServiceError as e:
             error_holder.append(e)
         finally:
@@ -166,25 +164,25 @@ def preview_command(
         )
         raise typer.Exit(1)
 
-    result = result_holder[0]  # type: ignore[assignment]
+    assert result is not None
 
     # Show retry attempts if there were multiple
-    if result.attempts > 1:  # type: ignore[union-attr]
-        console.print(f"[dim]Validation required {result.attempts} attempt(s).[/dim]\n")  # type: ignore[union-attr]
+    if result.attempts > 1:
+        console.print(f"[dim]Validation required {result.attempts} attempt(s).[/dim]\n")
 
     # Show the polished message
     console.print(
         Panel(
-            f"[bold green]{result.message}[/bold green]",  # type: ignore[union-attr]
+            f"[bold green]{result.message}[/bold green]",
             title="[bold]✓ Polished Commit Message[/bold]",
             border_style="green",
         )
     )
 
-    if result.validation_errors:  # type: ignore[union-attr]
+    if result.validation_errors:
         console.print(
             Panel(
-                "\n".join(f"• {e}" for e in result.validation_errors),  # type: ignore[union-attr]
+                "\n".join(f"• {e}" for e in result.validation_errors),
                 title="[yellow]Validation warnings (message used anyway)[/yellow]",
                 border_style="yellow",
             )
@@ -203,13 +201,13 @@ def preview_command(
 # ── test command ─────────────────────────────────────────────────────────────
 
 
-@app.command("test")
+@app.command("test")  # type: ignore[untyped-decorator]
 def test_command(
     message: str = typer.Option("", "--message", "-m", help="Draft commit message"),
-    diff_file: Optional[Path] = typer.Option(
+    diff_file: Path | None = typer.Option(
         None, "--diff", "-d", help="Path to diff file"
     ),
-    config_path: Optional[Path] = typer.Option(
+    config_path: Path | None = typer.Option(
         None, "--config", "-c", help="Path to config file"
     ),
 ) -> None:
@@ -234,9 +232,9 @@ def test_command(
 # ── config subcommands ────────────────────────────────────────────────────────
 
 
-@config_app.command("init")
+@config_app.command("init")  # type: ignore[untyped-decorator]
 def config_init(
-    path: Optional[Path] = typer.Option(
+    path: Path | None = typer.Option(
         None, "--path", help="Write config to this path instead of default"
     ),
     force: bool = typer.Option(
@@ -256,9 +254,9 @@ def config_init(
     console.print("\nEdit it to set your llamafile path and model.")
 
 
-@config_app.command("show")
+@config_app.command("show")  # type: ignore[untyped-decorator]
 def config_show(
-    path: Optional[Path] = typer.Option(None, "--path", help="Path to config file"),
+    path: Path | None = typer.Option(None, "--path", help="Path to config file"),
 ) -> None:
     """Show the current configuration."""
     config_path = path or DEFAULT_CONFIG_PATH
