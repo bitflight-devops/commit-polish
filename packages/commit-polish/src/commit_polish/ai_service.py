@@ -87,7 +87,12 @@ async def generate_commit_message(
     user_parts = []
 
     if diff:
-        user_parts.append(f"Git diff (staged changes):\n```\n{diff}\n```")
+        # Truncate large diffs — small models have limited context windows.
+        # 4 000 chars ≈ 1 000 tokens, leaving room for system prompt + output.
+        max_diff_chars = 4000
+        truncated = diff[:max_diff_chars]
+        suffix = f"\n… (truncated, {len(diff) - max_diff_chars} chars omitted)" if len(diff) > max_diff_chars else ""
+        user_parts.append(f"Git diff (staged changes):\n```\n{truncated}{suffix}\n```")
 
     if original_message.strip():
         user_parts.append(f"Original commit message: {original_message.strip()}")
